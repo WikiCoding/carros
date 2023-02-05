@@ -46,7 +46,7 @@
               allItems.innerHTML = "";
               const jsonRequest = {};
               jsonRequest.id = carro.id;
-              let result = await fetch(`${LOCAL_URL}`, {
+              let result = await fetch(`${WEB_URL}`, {
                 method: "DELETE",
                 headers: { "content-type": "application/json" },
                 body: JSON.stringify(jsonRequest),

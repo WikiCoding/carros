@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test</title>
+    <!-- <script defer src="main.js"></script> -->
+  </head>
+
+  <body>
+    <form>
+      <input type="text" id="idText" placeholder="id" /><input
+        type="text"
+        id="marcaText"
+        placeholder="marca"
+      /><input type="text" id="modeloText" placeholder="modelo" />
+      <button id="createBtn">Create New</button>
+    </form>
+    <div id="allItems"></div>
+    <script>
+      const WEB_URL = "https://carros-db.onrender.com/carros";
+      //const LOCAL_URL = "http://localhost:3000/carros";
+
+      const allItems = document.getElementById("allItems");
+      const createBtn = document.getElementById("createBtn");
+      const idTxt = document.getElementById("idText");
+      const marcaTxt = document.getElementById("marcaText");
+      const modeloTxt = document.getElementById("modeloText");
+
+      Render();
+      async function Render() {
+        try {
+          const result = await fetch(`${WEB_URL}`, {
+            method: "GET",
+          });
+
+          const carros = await result.json();
+
+          carros.forEach((carro) => {
+            let div = document.createElement("div");
+            allItems.appendChild(div);
+            div.innerHTML = `${carro.id} / ${carro.marca} / ${carro.modelo}`;
+
+            div.addEventListener("click", async (e) => {
+              allItems.innerHTML = "";
+              const jsonRequest = {};
+              jsonRequest.id = carro.id;
+              let result = await fetch(`${LOCAL_URL}`, {
+                method: "DELETE",
+                headers: { "content-type": "application/json" },
+                body: JSON.stringify(jsonRequest),
+              });
+
+              result = await result.json();
+
+              Render();
+
+              if (!result.success) alert("FAILED! ");
+            });
+          });
+        } catch (err) {
+          console.log(err);
+        }
+
+        createBtn.addEventListener("click", async (e) => {
+          const jsonRequest = {};
+          jsonRequest.id = idTxt.value;
+          jsonRequest.marca = marcaTxt.value;
+          jsonRequest.modelo = modeloTxt.value;
+
+          let result = await fetch(`${WEB_URL}`, {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify(jsonRequest),
+          });
+
+          result = await result.json();
+
+          Render();
+
+          if (!result.success) alert("FAILED! ");
+        });
+      }
+    </script>
+  </body>
+</html>
